@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        {{ document.title }}
+    </div>
+
+    <div class="card-body">
+        <p><strong>Описание:</strong> {{ document.description }}</p>
+        <p><strong>Автор:</strong> {{ document.author.username }}</p>
+
+        <p>
+            <strong>Статус:</strong>
+            {% if document.status %}
+                {{ document.status.name }}
+            {% else %}
+                Без статуса
+            {% endif %}
+        </p>
+
+        <p><strong>Дата создания:</strong> {{ document.created_at|date:"d.m.Y H:i" }}</p>
+
+        {% if document.file %}
+            <p>
+                <strong>Файл:</strong>
+                <a href="{{ document.file.url }}" target="_blank">
+                    Открыть файл
+                </a>
+            </p>
+        {% endif %}
+
+        <div class="mt-3">
+            {% if document.author == user or user.is_staff %}
+                <a href="{% url 'document_edit' document.pk %}" class="btn btn-warning">
+                    Редактировать
+                </a>
+
+                <a href="{% url 'document_delete' document.pk %}" class="btn btn-danger">
+                    Удалить
+                </a>
+
+                <a href="{% url 'send_to_approval' document.pk %}" class="btn btn-info">
+                    Отправить на согласование
+                </a>
+            {% endif %}
+
+            {% if user.is_staff or user.groups.all.0.name == 'Руководитель' %}
+                <a href="{% url 'approve_document' document.pk %}" class="btn btn-success">
+                    Утвердить
+                </a>
+
+                <a href="{% url 'reject_document' document.pk %}" class="btn btn-outline-danger">
+                    Отклонить
+                </a>
+            {% endif %}
+
+            <a href="{% url 'document_list' %}" class="btn btn-secondary">
+                Назад
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

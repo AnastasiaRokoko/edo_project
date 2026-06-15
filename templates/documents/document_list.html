@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Список документов</h2>
+
+    <a href="{% url 'document_create' %}" class="btn btn-primary">
+        Создать документ
+    </a>
+</div>
+
+<form method="get" class="row mb-4">
+    <div class="col-md-5">
+        <input
+            type="text"
+            name="q"
+            value="{{ query }}"
+            class="form-control"
+            placeholder="Поиск по названию"
+        >
+    </div>
+
+    <div class="col-md-4">
+        <select name="status" class="form-select">
+            <option value="">Все статусы</option>
+
+            {% for status in statuses %}
+                <option value="{{ status.id }}"
+                    {% if selected_status == status.id|stringformat:"s" %}selected{% endif %}
+                >
+                    {{ status.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <button class="btn btn-outline-primary w-100">
+            Найти
+        </button>
+    </div>
+</form>
+
+<table class="table table-bordered table-hover bg-white">
+    <thead class="table-primary">
+        <tr>
+            <th>Название</th>
+            <th>Автор</th>
+            <th>Статус</th>
+            <th>Дата создания</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for document in documents %}
+        <tr>
+            <td>{{ document.title }}</td>
+            <td>{{ document.author.username }}</td>
+            <td>
+                {% if document.status %}
+                    {{ document.status.name }}
+                {% else %}
+                    Без статуса
+                {% endif %}
+            </td>
+            <td>{{ document.created_at|date:"d.m.Y H:i" }}</td>
+            <td>
+                <a href="{% url 'document_detail' document.pk %}" class="btn btn-sm btn-outline-primary">
+                    Открыть
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="text-center">
+                Документы не найдены
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
